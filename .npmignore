@@ -3,7 +3,6 @@
 # Arquivos de desenvolvimento
 tests/
 docs/ETAPA-*.md
-docs/
 example-bot/
 *.test.ts
 *.test.js
