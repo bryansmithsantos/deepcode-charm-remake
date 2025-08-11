@@ -85,3 +85,6 @@ yarn.lock
 *.bak
 *.backup
 *.old
+
+# Esconder o próprio .gitignore para manter privacidade
+.gitignore

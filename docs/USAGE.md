@@ -10,7 +10,7 @@ Este guia fornece exemplos práticos e avançados para usar e estender o DeepCod
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/deepcode-charm.git
+git clone https://github.com/bryansmithsantos/deepcode-charm-remake.git
 cd deepcode-charm/beta_version
 
 # 2. Instale dependências
