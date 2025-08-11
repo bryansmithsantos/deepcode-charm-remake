@@ -1,6 +1,6 @@
 {
   "name": "deepcode-charm",
-  "version": "1.0.0",
+  "version": "1.0.0a",
   "description": "Framework modular para bots do Discord usando charms como blocos de construção",
   "main": "src/index.js",
   "types": "src/types/index.ts",
@@ -25,7 +25,7 @@
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
     "prepublishOnly": "bun run build && bun test",
-    "postinstall": "echo 'DeepCode Charm Framework instalado! Consulte a documentação: https://github.com/deepcode-charm/framework#readme'"
+    "postinstall": "echo 'DeepCode Charm Framework instalado! Consulte a documentação: https://github.com/deepcode-charm-remake/framework#readme'"
   },
   "keywords": [
     "discord",
@@ -44,22 +44,21 @@
     "secure"
   ],
   "author": {
-    "name": "DeepCode Charm Team",
-    "email": "contact@deepcode-charm.dev",
-    "url": "https://github.com/deepcode-charm"
+    "name": "leref01",
+    "url": "https://github.com/bryansmithsantos/deepcode-charm-remake"
   },
   "license": "MIT",
   "homepage": "https://github.com/deepcode-charm/framework#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/deepcode-charm/framework.git"
+    "url": "https://github.com/bryansmithsantos/deepcode-charm-remake.git"
   },
   "bugs": {
-    "url": "https://github.com/deepcode-charm/framework/issues"
+    "url": "https://github.com/deepcode-charm-remake/framework/issues"
   },
   "funding": {
     "type": "github",
-    "url": "https://github.com/sponsors/deepcode-charm"
+    "url": "https://github.com/sponsors/deepcode-charm-remake"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
