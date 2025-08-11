@@ -1,33 +1,49 @@
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { CharmFunction, CharmMetadata } from '../types/index.js';
 
 /**
- * Charm para criar embeds personalizados
- * Uso: $embed[título|descrição|cor]
- * Parâmetros separados por |
+ * Charm para criar embeds personalizados com botão opcional
+ * Uso: $embed título descrição cor
+ * Formato simplificado: separado por espaços, não mais por |
  */
 export const embedCharm: CharmFunction = async (context) => {
   const { message, args } = context;
 
   if (!args || args.trim().length === 0) {
     await message.reply(
-      '❌ Uso correto: `$embed[título|descrição|cor]`\n' +
-      '**Exemplo:** `$embed[Meu Título|Esta é a descrição|#ff0000]`\n' +
-      '**Cor (opcional):** Hexadecimal como #ff0000 ou nomes como red, blue, green'
+      '❌ **Uso correto:** `$embed título descrição cor`\n' +
+      '**Exemplo:** `$embed Bem-vindos Este é nosso servidor! blue`\n' +
+      '**Cores:** red, blue, green, yellow, orange, purple, pink ou hex (#ff0000)'
     );
     return;
   }
 
   try {
-    // Parse dos argumentos separados por |
-    const parts = args.split('|').map(part => part.trim());
+    // Parse dos argumentos separados por espaço
+    const parts = args.trim().split(' ');
     
     if (parts.length < 2) {
-      await message.reply('❌ Formato inválido! Mínimo: título e descrição separados por |');
+      await message.reply('❌ Formato inválido! Mínimo: `$embed título descrição`');
       return;
     }
 
-    const [title, description, color] = parts;
+    // Extrair título (primeira palavra), cor (última palavra se for cor válida), resto é descrição
+    const title = parts[0];
+    let description = '';
+    let color = '0x00AE86'; // Cor padrão
+
+    // Verificar se a última palavra é uma cor válida
+    const lastWord = parts[parts.length - 1].toLowerCase();
+    const colorValue = parseColor(lastWord);
+    
+    if (colorValue !== null) {
+      // Última palavra é cor válida
+      color = colorValue.toString();
+      description = parts.slice(1, -1).join(' ');
+    } else {
+      // Última palavra não é cor, toda é descrição
+      description = parts.slice(1).join(' ');
+    }
 
     // Validações
     if (title.length > 256) {
@@ -44,29 +60,80 @@ export const embedCharm: CharmFunction = async (context) => {
     const embed = new EmbedBuilder()
       .setTitle(title)
       .setDescription(description)
+      .setColor(parseInt(color))
       .setTimestamp()
       .setFooter({
         text: `Solicitado por ${message.author.username}`,
         iconURL: message.author.displayAvatarURL()
       });
 
-    // Define cor se fornecida
-    if (color) {
-      const colorValue = parseColor(color);
-      if (colorValue !== null) {
-        embed.setColor(colorValue);
-      }
-    } else {
-      embed.setColor(0x00AE86); // Cor padrão (verde azulado)
-    }
+    // Criar botão interativo
+    const button = new ButtonBuilder()
+      .setCustomId(`embed_${message.author.id}_${Date.now()}`)
+      .setLabel('👍 Curtir')
+      .setStyle(ButtonStyle.Primary);
 
-    // Envia o embed
-    if ('send' in message.channel) {
-      await message.channel.send({ embeds: [embed] });
-    } else {
-      await message.reply('❌ Este tipo de canal não suporta o envio de embeds.');
+    const row = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(button);
+
+    // Envia o embed com botão
+    if (!('send' in message.channel)) {
+      await message.reply('❌ Este tipo de canal não suporta embeds.');
       return;
     }
+
+    const embedMessage = await message.channel.send({ 
+      embeds: [embed], 
+      components: [row] 
+    });
+
+    // Listener para o botão (simples)
+    const collector = embedMessage.createMessageComponentCollector({
+      time: 300000 // 5 minutos
+    });
+
+    let likes = 0;
+    const likedUsers = new Set<string>();
+
+    collector.on('collect', async (interaction) => {
+      if (!interaction.isButton()) return;
+
+      if (likedUsers.has(interaction.user.id)) {
+        await interaction.reply({ 
+          content: '❌ Você já curtiu este embed!', 
+          ephemeral: true 
+        });
+        return;
+      }
+
+      likes++;
+      likedUsers.add(interaction.user.id);
+
+      // Atualizar botão
+      const updatedButton = new ButtonBuilder()
+        .setCustomId(`embed_${message.author.id}_${Date.now()}`)
+        .setLabel(`👍 Curtir (${likes})`)
+        .setStyle(ButtonStyle.Primary);
+
+      const updatedRow = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(updatedButton);
+
+      await interaction.update({ components: [updatedRow] });
+    });
+
+    collector.on('end', async () => {
+      // Desabilitar botão após timeout
+      const disabledButton = new ButtonBuilder()
+        .setCustomId(`embed_disabled`)
+        .setLabel(`👍 Curtir (${likes}) - Expirado`)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true);
+
+      const disabledRow = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(disabledButton);
+
+      await embedMessage.edit({ components: [disabledRow] }).catch(() => {});
+    });
 
     // Remove mensagem original se possível
     if (message.deletable) {
@@ -74,6 +141,7 @@ export const embedCharm: CharmFunction = async (context) => {
     }
 
   } catch (error) {
+    console.error('Erro no embed charm:', error);
     await message.reply('❌ Erro ao criar embed. Verifique os parâmetros e tente novamente.');
   }
 };
@@ -128,8 +196,8 @@ function parseColor(colorInput: string): number | null {
  */
 export const embedMetadata: CharmMetadata = {
   name: 'embed',
-  description: 'Cria um embed personalizado com título, descrição e cor',
-  usage: '$embed[título|descrição|cor]',
+  description: 'Cria um embed personalizado com título, descrição, cor e botão interativo',
+  usage: '$embed título descrição cor',
   adminOnly: false,
   cooldown: 3, // 3 segundos de cooldown
   category: 'utility'

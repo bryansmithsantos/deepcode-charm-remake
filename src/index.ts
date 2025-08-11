@@ -8,6 +8,9 @@ import { sayCharm, sayMetadata } from './charms/say.js';
 import { pingCharm, pingMetadata } from './charms/ping.js';
 import { embedCharm, embedMetadata } from './charms/embed.js';
 import { helpCharm, helpMetadata } from './charms/help.js';
+import { avatarCharm, avatarMetadata } from './charms/avatar.js';
+import { pollCharm, pollMetadata } from './charms/poll.js';
+import { serverinfoCharm, serverinfoMetadata } from './charms/serverinfo.js';
 
 /**
  * Parser de argumentos da linha de comando
@@ -189,7 +192,10 @@ function registerBasicCharms(client: CharmClient): void {
     { func: sayCharm, meta: sayMetadata },
     { func: pingCharm, meta: pingMetadata },
     { func: embedCharm, meta: embedMetadata },
-    { func: helpCharm, meta: helpMetadata }
+    { func: helpCharm, meta: helpMetadata },
+    { func: avatarCharm, meta: avatarMetadata },
+    { func: pollCharm, meta: pollMetadata },
+    { func: serverinfoCharm, meta: serverinfoMetadata }
   ];
 
   for (const { func, meta } of charms) {
