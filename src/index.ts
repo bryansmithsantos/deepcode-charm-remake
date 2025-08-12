@@ -8,6 +8,9 @@ import { sayCharm, sayMetadata } from './charms/say.js';
 import { pingCharm, pingMetadata } from './charms/ping.js';
 import { embedCharm, embedMetadata } from './charms/embed.js';
 import { helpCharm, helpMetadata } from './charms/help.js';
+import { avatarCharm, avatarMetadata } from './charms/avatar.js';
+import { serverinfoCharm, serverinfoMetadata } from './charms/serverinfo.js';
+import { clearCharm, clearMetadata } from './charms/clear.js';
 
 /**
  * Parser de argumentos da linha de comando
@@ -80,6 +83,9 @@ COMANDOS DISPONÍVEIS NO BOT:
   $say[texto]                    - Bot envia uma mensagem
   $ping[]                        - Mostra latência do bot
   $embed[título|descrição|cor]   - Cria um embed personalizado
+  $avatar[@usuário]              - Mostra avatar de usuário em alta qualidade
+  $serverinfo[]                  - Informações detalhadas do servidor
+  $clear[quantidade] [motivo]    - Remove mensagens (admin)
   $help[]                        - Lista todos os comandos
 
 MAIS INFORMAÇÕES:
@@ -183,19 +189,22 @@ async function main() {
  * Registra todos os charms básicos no cliente
  */
 function registerBasicCharms(client: CharmClient): void {
-  console.log('🔧 Registrando charms básicos...');
+  console.log('🔧 Registrando charms...');
 
   const charms = [
     { func: sayCharm, meta: sayMetadata },
     { func: pingCharm, meta: pingMetadata },
     { func: embedCharm, meta: embedMetadata },
+    { func: avatarCharm, meta: avatarMetadata },
+    { func: serverinfoCharm, meta: serverinfoMetadata },
+    { func: clearCharm, meta: clearMetadata },
     { func: helpCharm, meta: helpMetadata }
   ];
 
   for (const { func, meta } of charms) {
     try {
       client.registerCharm(func, meta);
-      console.log(`   ✅ ${meta.name} registrado`);
+      console.log(`   ✅ ${meta.name} registrado (${meta.category})`);
     } catch (error) {
       console.error(`   ❌ Erro ao registrar charm ${meta.name}:`, error);
     }
