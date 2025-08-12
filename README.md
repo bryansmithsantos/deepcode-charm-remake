@@ -1,11 +1,12 @@
 # 🔮 DeepCode Charm Framework
 
-> **Framework modular e intuitivo para bots Discord - A alternativa moderna ao aoi.js**
+> **Framework modular e intuitivo para bots Discord - A alternativa moderna ao aoi.js com segurança avançada**
 
 [![Bun](https://img.shields.io/badge/Bun-1.0+-000000?style=flat&logo=bun)](https://bun.sh)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Discord.js](https://img.shields.io/badge/Discord.js-14.0+-5865F2?style=flat&logo=discord)](https://discord.js.org)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Security](https://img.shields.io/badge/Security-Hardened-red.svg)](docs/SECURITY.md)
 
 ## ✨ Por que DeepCode Charm?
 
@@ -16,21 +17,29 @@ Se você já usou **aoi.js**, vai se sentir em casa! Mesma sintaxe simples:
 $say Olá mundo!
 $ping
 $embed Título|Descrição|cor
+$avatar @usuário
+$serverinfo
 ```
 
 ### 🚀 **Moderno e Performático**
 - ⚡ **Runtime Bun** - Até 3x mais rápido que Node.js
 - 🔒 **TypeScript nativo** - Type safety completa
-- 🛡️ **Segurança avançada** - Rate limiting e validações
+- 🛡️ **Segurança avançada** - Sistema hardening completo
 - 📊 **Logs inteligentes** - Auditoria completa
+- 🔐 **Criptografia** - Dados sensíveis protegidos
+- ⚖️ **Rate limiting inteligente** - Exponential backoff automático
 
-### 🧩 **Sistema de Charms**
-Charms são blocos de construção modulares - como comandos, mas mais poderosos:
+### 🧩 **Sistema de Charms Expandido**
+Charms são blocos de construção modulares - agora com ainda mais poder:
 ```typescript
-// Cada charm é independente e reutilizável
-const meuCharm: CharmFunction = async (context) => {
-  await context.message.reply('Meu charm personalizado!');
-};
+// 7 charms inclusos + sistema de extensão
+$say[mensagem]           // Utilitário - Enviar mensagens
+$ping                    // Utilitário - Teste de latência  
+$embed[título|desc|cor]  // Utilitário - Embeds personalizados
+$avatar[@usuário]        // Utilitário - Avatar em alta resolução
+$serverinfo              // Informação - Estatísticas do servidor
+$clear[qtd] [motivo]     // Moderação - Limpeza de mensagens (admin)
+$help [charm]            // Informação - Sistema de ajuda dinâmico
 ```
 
 ## 🚀 Início Rápido (5 minutos)
@@ -79,8 +88,8 @@ const client = new CharmClient({
   }
 });
 
-// Os charms básicos já vêm inclusos!
-// say, ping, embed, help
+// Os charms já vêm inclusos!
+// say, ping, embed, avatar, serverinfo, clear, help
 
 // Inicie o bot
 client.start(process.env.DISCORD_TOKEN);
@@ -88,9 +97,24 @@ client.start(process.env.DISCORD_TOKEN);
 
 ### 4. **Arquivo .env**
 ```env
+# Configuração básica
 DISCORD_TOKEN=seu_token_aqui
 PREFIX=$
 BOT_STATUS=online
+LOG_LEVEL=info
+
+# Configurações de segurança ✨ NOVO
+SECURITY_KEY=sua_chave_criptografia_secreta_aqui
+ADMIN_USERS=123456789012345678,987654321098765432
+ALLOWED_GUILDS=id_guild_1,id_guild_2
+
+# Rate limiting ✨ APRIMORADO  
+RATE_LIMIT_MAX=10
+RATE_LIMIT_WINDOW=60
+
+# Atividade do bot
+BOT_ACTIVITY_NAME=com charms seguros ✨
+BOT_ACTIVITY_TYPE=PLAYING
 ```
 
 ### 5. **Execute!**
@@ -100,11 +124,14 @@ bun run index.js
 node index.js
 ```
 
-**🎉 Pronto! Seu bot já funciona com comandos:**
-- `$say Olá pessoal!`
-- `$ping`
-- `$embed Aviso|Manutenção hoje|red`
-- `$help`
+**🎉 Pronto! Seu bot já funciona com 7 comandos:**
+- `$say Olá pessoal!` - Envia mensagens
+- `$ping` - Testa latência
+- `$embed Aviso|Manutenção hoje|red` - Cria embeds
+- `$avatar @usuário` - ✨ Avatar em alta qualidade
+- `$serverinfo` - ✨ Informações do servidor
+- `$clear 10` - ✨ Moderação (admin)
+- `$help` - Lista de comandos
 
 ---
 
@@ -166,6 +193,58 @@ $help embed        // Informações do comando embed
 - ✅ **Estatísticas do bot** em tempo real
 - ✅ **Comandos admin** aparecem riscados para usuários normais
 
+#### **$avatar** - Avatar em Alta Qualidade ✨ NOVO
+```javascript
+$avatar              // Seu próprio avatar
+$avatar @usuário     // Avatar de outro usuário
+$avatar 123456789    // Avatar por ID do usuário
+
+// Resposta inclui:
+// 🖼️ Imagem em 512x512 pixels
+// 📥 Links de download em PNG, JPG, WebP
+// 🎭 Detecção de avatar animado (GIF)
+// 👤 Informações do usuário
+```
+- ✅ **Máxima qualidade** (512x512px)
+- ✅ **Múltiplos formatos** de download
+- ✅ **Detecta GIFs animados**
+- ✅ **Funciona com IDs** de usuário
+
+#### **$serverinfo** - Informações Completas do Servidor ✨ NOVO
+```javascript
+$serverinfo
+
+// Mostra informações detalhadas:
+// 👑 Proprietário e data de criação
+// 👥 Estatísticas de membros (total, humanos, bots, online)
+// 📡 Contagem de canais por tipo
+// 🚀 Status de Boost e recursos premium
+// 🛡️ Níveis de segurança e moderação
+// 🎭 Emojis, stickers e cargos
+// ✨ Recursos especiais do Discord
+```
+- ✅ **Informações completas** do servidor
+- ✅ **Estatísticas em tempo real**
+- ✅ **Recursos premium** destacados
+- ✅ **Design profissional**
+
+#### **$clear** - Moderação Avançada ✨ NOVO 🛡️ ADMIN
+```javascript
+$clear 10                    // Remove 10 mensagens
+$clear 5 Spam removido      // Remove 5 com motivo
+$clear 50                   // Pede confirmação (>50 msgs)
+
+// Recursos de segurança:
+// ⚠️ Confirmação para grandes quantidades
+// 📝 Log completo de auditoria
+// ⚡ Limpeza automática da confirmação
+// 🚫 Respeita limitações do Discord
+```
+- ✅ **Apenas administradores** podem usar
+- ✅ **Sistema de confirmação** para grandes volumes
+- ✅ **Logs de auditoria** completos
+- ✅ **Respeitia limites** do Discord (14 dias, 100 msgs)
+
 ### 🤖 **Sistema de Menções**
 
 O bot responde automaticamente quando mencionado:
@@ -195,38 +274,83 @@ $sai olá
 // 📋 Use `$help` para ver todos os comandos.
 ```
 
-### 🛡️ **Sistema de Segurança**
+### 🛡️ **Sistema de Segurança Hardening**
 
-#### **Rate Limiting Automático**
+#### **Proteções Multi-Camadas**
 ```javascript
-// Configuração padrão:
-// - 10 comandos por minuto por usuário
-// - Cooldowns específicos por comando
-// - Admins têm privilégios especiais
+// Validação avançada de entrada:
+// ❌ Bloqueia 30+ padrões perigosos
+// ❌ Detecta tentativas de injeção
+// ❌ Filtra URLs maliciosas
+// ❌ Impede flooding de menções/emojis
+// ❌ Caracteres suspeitos removidos
+```
+
+#### **Rate Limiting com Exponential Backoff**
+```javascript
+// Sistema inteligente de punições:
+// 1ª violação: Warning
+// 5+ violações: Ban temporário
+// Bans escalonados: 5min → 15min → 1h → 6h → 24h
+// Reset automático após bom comportamento
 
 const client = new CharmClient({
-  // ... outras opções
   rateLimit: {
-    maxCommands: 15,    // Máx comandos
-    timeWindow: 60      // Por minuto
+    maxCommands: 10,    // Comandos por período
+    timeWindow: 60      // Janela em segundos
   }
 });
 ```
 
-#### **Sistema de Permissões**
+#### **Criptografia de Dados Sensíveis ✨ NOVO**
+```javascript
+// Proteção automática de informações confidenciais
+// 🔐 Tokens e chaves criptografadas
+// 🗝️ Hash de integridade para validação
+// 🔄 Rotação automática de chaves
+```
+
+#### **Sistema de Auditoria Avançado ✨ NOVO**
+```javascript
+// Logs completos de segurança:
+// 📝 Todos os comandos executados
+// 🚨 Tentativas de violação de segurança
+// 👤 Tracking de usuários suspeitos
+// 📊 Estatísticas de uso em tempo real
+// 🔍 Rastreamento de padrões maliciosos
+```
+
+#### **Validação de Integridade de Charms ✨ NOVO**
+```javascript
+// Verificação automática ao registrar charms:
+// ✅ Código fonte analisado por padrões perigosos
+// ✅ Tamanho de código limitado (50KB)
+// ✅ Hash de integridade verificado
+// ❌ Charms maliciosos rejeitados automaticamente
+```
+
+#### **Sistema de Permissões Expandido**
 ```javascript
 const client = new CharmClient({
-  // ... outras opções
   adminUsers: ['123456789', '987654321'], // IDs de admin
-  allowedGuilds: ['guild1', 'guild2']     // Servers permitidos
+  allowedGuilds: ['guild1', 'guild2'],    // Servers permitidos
+  // Configuração de segurança adicional
+  rateLimit: {
+    maxCommands: 10,
+    timeWindow: 60
+  }
 });
 ```
 
-#### **Validação de Entrada**
-- ✅ **Caracteres perigosos** bloqueados automaticamente
-- ✅ **Tamanho de mensagem** limitado
-- ✅ **Injection attacks** prevenidos
-- ✅ **Logs de segurança** completos
+#### **Proteções Implementadas**
+- ✅ **50+ padrões maliciosos** detectados e bloqueados
+- ✅ **URLs suspeitas** filtradas (bit.ly, grabify, etc.)
+- ✅ **Flood protection** (menções, emojis, caracteres)
+- ✅ **Path traversal** e **SQL injection** prevenidos
+- ✅ **XSS e script injection** bloqueados
+- ✅ **Exponential backoff** com bans automáticos
+- ✅ **Logs de auditoria** completos com timestamps
+- ✅ **Limpeza automática** de dados antigos
 
 ---
 
@@ -714,6 +838,84 @@ git commit -m "feat: adicionar nova funcionalidade"
 # 10. Push e abra um Pull Request
 git push origin minha-feature
 ```
+
+---
+
+## 🔒 **Atualizações de Segurança v1.0.0a** ✨ NOVO
+
+### **⚡ Security Hardening Implementado**
+
+O framework agora possui **segurança nível empresarial** com:
+
+#### **🛡️ Proteções Multi-Camadas**
+- **50+ padrões maliciosos** detectados (XSS, SQL injection, code injection)
+- **URL filtering** - Bloqueia links suspeitos (bit.ly, grabify, iplogger)
+- **Flood protection** - Previne spam de menções, emojis e caracteres
+- **Input sanitization** - Remove caracteres perigosos automaticamente
+- **Path traversal** prevention - Bloqueia tentativas de acesso a arquivos
+
+#### **🚨 Sistema de Punições Inteligente**
+- **Rate limiting** com exponential backoff
+- **Bans automáticos** escalonados: 5min → 15min → 1h → 6h → 24h
+- **Tracking de violações** por usuário
+- **Reset automático** após bom comportamento
+- **Whitelist de admins** com privilégios especiais
+
+#### **🔐 Criptografia e Integridade**
+- **Dados sensíveis criptografados** com AES-256
+- **Hash de integridade** para validação de charms
+- **Verificação automática** de código malicioso
+- **Chaves rotacionáveis** para segurança máxima
+
+#### **📊 Auditoria Avançada**
+- **Logs completos** de todas as atividades
+- **Tracking de usuários suspeitos**
+- **Estatísticas de segurança** em tempo real
+- **Alertas automáticos** para administradores
+- **Limpeza automática** de dados antigos
+
+#### **⚙️ Configuração de Segurança**
+```env
+# .env - Configurações de segurança
+SECURITY_KEY=sua_chave_super_secreta_aqui
+LOG_LEVEL=warn                    # Para produção
+RATE_LIMIT_MAX=10                 # Comandos por minuto
+RATE_LIMIT_WINDOW=60              # Janela de tempo
+ADMIN_USERS=id1,id2,id3           # Admins do sistema
+ALLOWED_GUILDS=guild1,guild2      # Servidores permitidos
+```
+
+### **🆕 Novos Charms de Utilidade**
+
+#### **1. $avatar - Avatar em Ultra HD**
+- Avatares em **512x512 pixels**
+- Download em **múltiplos formatos** (PNG, JPG, WebP, GIF)
+- **Detecção automática** de avatares animados
+- Suporte a **IDs de usuário** diretos
+
+#### **2. $serverinfo - Análise Completa do Servidor**
+- **Estatísticas detalhadas** de membros e canais
+- **Recursos premium** do Discord destacados
+- **Níveis de segurança** e moderação
+- **Design profissional** com informações organizadas
+
+#### **3. $clear - Moderação Profissional**
+- **Sistema de confirmação** para grandes quantidades
+- **Logs de auditoria** completos com timestamps
+- **Respeita limitações** do Discord (14 dias)
+- **Limpeza automática** de mensagens de confirmação
+
+### **📈 Melhorias de Performance**
+- **Validação otimizada** de entrada
+- **Cache inteligente** para rate limiting
+- **Limpeza automática** de dados antigos
+- **Monitoramento** de recursos em tempo real
+
+### **🔧 Para Desenvolvedores**
+- **Novos tipos TypeScript** para recursos de segurança
+- **Métodos de validação** expostos para charms personalizados
+- **Hooks de segurança** para eventos customizados
+- **Documentação atualizada** com exemplos práticos
 
 ---
 

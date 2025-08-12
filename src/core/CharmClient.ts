@@ -295,9 +295,9 @@ export class CharmClient extends Client {
       }
     }
 
-    // Valida argumentos
+    // Valida argumentos com userId para logging de segurança
     if (parsed.args) {
-      Security.validateInput(parsed.args);
+      Security.validateInput(parsed.args, userId);
     }
 
     // Cria contexto para execução
@@ -333,11 +333,17 @@ export class CharmClient extends Client {
   }
 
   /**
-   * Registra um novo charm
+   * Registra um novo charm com validação de integridade
    */
   public registerCharm(charmFunction: CharmFunction, metadata: CharmMetadata): void {
     if (this.charms.has(metadata.name)) {
       logger.warn(`Charm '${metadata.name}' já existe, sobrescrevendo...`);
+    }
+
+    // Validação de integridade do charm
+    const charmCode = charmFunction.toString();
+    if (!Security.validateCharmIntegrity(metadata.name, charmCode)) {
+      throw new Error(`Charm '${metadata.name}' falhou na verificação de integridade`);
     }
 
     const registry: CharmRegistry = {
@@ -352,7 +358,8 @@ export class CharmClient extends Client {
     logger.info(`Charm registrado: ${metadata.name}`, {
       category: metadata.category,
       adminOnly: metadata.adminOnly,
-      cooldown: metadata.cooldown
+      cooldown: metadata.cooldown,
+      integrityValidated: true
     });
   }
 
@@ -489,16 +496,60 @@ export class CharmClient extends Client {
   }
 
   /**
-   * Inicia o bot
+   * Inicia o bot com validação de segurança
    */
   public async start(token: string): Promise<void> {
     try {
+      // Validação de configurações de segurança
+      const securityCheck = Security.validateSecurityConfig();
+      
+      if (!securityCheck.isValid) {
+        logger.fatal('Falha na validação de segurança', {
+          errors: securityCheck.errors
+        });
+        throw new Error('Configurações de segurança inválidas: ' + securityCheck.errors.join(', '));
+      }
+
+      if (securityCheck.warnings.length > 0) {
+        logger.warn('Avisos de segurança encontrados', {
+          warnings: securityCheck.warnings
+        });
+      }
+
+      // Inicia limpeza periódica de dados de segurança
+      this.startSecurityCleanup();
+
       await this.login(token);
-      logger.info('Bot conectado com sucesso');
+      logger.info('Bot conectado com sucesso', {
+        securityValidated: true,
+        warnings: securityCheck.warnings.length
+      });
     } catch (error) {
       logger.fatal('Falha ao conectar bot', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
+  }
+
+  /**
+   * Inicia limpeza periódica de segurança (executa a cada hora)
+   */
+  private startSecurityCleanup(): void {
+    setInterval(() => {
+      try {
+        RateLimit.cleanup();
+        Security.cleanupSecurityData();
+        
+        const rateLimitStats = RateLimit.getStats();
+        logger.info('Limpeza periódica de segurança executada', {
+          activeUsers: rateLimitStats.activeUsers,
+          totalCommands: rateLimitStats.totalCommands,
+          totalViolations: rateLimitStats.totalViolations,
+          bannedUsers: rateLimitStats.bannedUsers
+        });
+      } catch (error) {
+        logger.error('Erro durante limpeza de segurança', error);
+      }
+    }, 60 * 60 * 1000); // 1 hora
   }
 
   /**
